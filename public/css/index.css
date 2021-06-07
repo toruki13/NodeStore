@@ -1,0 +1,54 @@
+input[type='email']:invalid {
+  background-color: rgba(255, 166, 134, 0.3);
+}
+
+input[type='email']:not(:placeholder-shown):invalid {
+  background-color: rgba(255, 166, 134, 0.3);
+}
+
+form {
+  border: 0px;
+  border-radius: 2px;
+  max-width: 380px;
+  padding: 15px 35px 45px;
+  margin: 0 auto;
+  background-color: #faf2f287;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+label {
+  color: rgb(233, 156, 156);
+  font-family: Arial, sans-serif;
+
+  font-size: 100%;
+  font-weight: 500;
+  text-align: center;
+}
+input {
+  border-style: solid;
+  border: 0px;
+  background-color: #fa80722e;
+  border-radius: 2px;
+  width: 100%;
+  padding: 5px 2px;
+  margin: 2px 0;
+  box-sizing: border-box;
+  color: white;
+}
+
+section {
+  margin: 20px 0;
+}
+
+button {
+  border-radius: 3px;
+  border: none;
+  font-size: medium;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.4rem;
+  background-color: salmon;
+  color: azure;
+  display: block;
+  margin: 0 auto !important;
+  width: 50%;
+}

@@ -1,0 +1,29 @@
+.product-form {
+    width: 20rem;
+    max-width: 90%;
+    margin: auto;
+}
+html {
+    overflow-y: scroll;
+}
+.product-item {
+    width: 15rem;
+    height: auto;
+    max-width: 95%;
+    margin: 1rem 0.5rem;
+}
+
+.product__title {
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.product__price {
+    text-align: center;
+    color: #4d4d4d;
+    margin-bottom: 0.5rem;
+}
+
+.product__description {
+    text-align: center;
+}

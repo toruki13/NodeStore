@@ -1,0 +1,68 @@
+<section class="banner">
+  <h1 class="banner_text">NARAINKU</h1>
+  <header class="main-header">
+    <nav class="main-header__nav">
+      <ul class="main-header__item-list">
+        <li class="main-header__item">
+          <a class="<%= path ==='/' ? 'active':'' %>" href="/shop">Shop</a>
+        </li>
+
+        <li class="main-header__item">
+          <a class="<%= path ==='/products' ? 'active':'' %>" href="/products"
+            >Products</a
+          >
+        </li>
+        <%if(isAuthenticated){ %>
+
+        <li class="main-header__item">
+          <a class="<%= path ==='/cart' ? 'active':'' %>" href="/cart">Cart</a>
+        </li>
+
+        <li class="main-header__item">
+          <a class="<%= path ==='/orders' ? 'active':'' %>" href="/orders"
+            >Orders</a
+          >
+        </li>
+        <li class="main-header__item">
+          <a
+            class="<%= path ==='/admin/add-product' ? 'active':'' %>"
+            href="/admin/add-product"
+            >Add Product</a
+          >
+        </li>
+
+        <li class="main-header__item">
+          <a
+            class="<%= path ==='/admin/products' ? 'active':'' %>"
+            href="/admin/products"
+            >Admin Products
+          </a>
+        </li>
+
+        <%}%>
+      </ul>
+
+      <ul class="main-header__item-list">
+        <%if(!isAuthenticated){ %>
+        <li class="main-header__item">
+          <a class="<%= path ==='/login' ? 'active':'' %>" href="/login"
+            >Login</a
+          >
+        </li>
+        <li class="main-header__item">
+          <a class="<%= path ==='/signup' ? 'active':'' %>" href="/signup"
+            >SignUp</a
+          >
+        </li>
+        <%} else{%>
+        <li class="main-header__item">
+          <form action="/logout" method="post">
+            <input type="hidden" name="_csrf" value="<%= csrfToken %>" />
+            <button type="submit">logout</button>
+          </form>
+        </li>
+        <%}%>
+      </ul>
+    </nav>
+  </header>
+</section>
