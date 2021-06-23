@@ -31,9 +31,9 @@ exports.getEditProduct = (req, res, next) => {
     return res.redirect('/');
   }
   const prodId = req.params.productId;
-  console.log(prodId);
   Product.findById(prodId)
     .then((product) => {
+      throw new Error('ERROR');
       if (!product) {
         console.log('no product');
         return res.redirect('/admin/products');
@@ -47,7 +47,14 @@ exports.getEditProduct = (req, res, next) => {
         hasError: false,
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      /*  error.httpStatusCode = 500;
+      return next(error); */
+      return res.status(500).render('/500', {
+        error: error,
+      });
+    });
 };
 
 exports.postAddProduct = (req, res, next) => {
@@ -56,7 +63,7 @@ exports.postAddProduct = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    const { value, msg, param } = errors.array()[0];
+    const { param } = errors.array()[0];
     console.log(errors);
     return res.render('admin/edit-product', {
       docTitle: 'Add Product',
@@ -89,7 +96,28 @@ exports.postAddProduct = (req, res, next) => {
     .then((result) => {
       res.redirect('/admin/products');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      /* console.log(err);
+      return res.status(500).render('admin/edit-product', {
+        docTitle: 'Add Product',
+        path: '/admin/add-product',
+        editing: false,
+        hasError: true,
+        product: {
+          title: param === 'title' ? '' : title,
+          price: param === 'price' ? '' : price,
+          description: param === 'description' ? '' : description,
+          imageUrl: param == 'imageUrl' ? '' : imageUrl,
+        },
+        errorMessage: 'Data Base Operation Error Please try again',
+
+        validationErrors: [],
+      }); */
+      /*   res.redirect('/500'); */
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postEditProduct = (req, res, next) => {
@@ -119,9 +147,6 @@ exports.postEditProduct = (req, res, next) => {
 
   Product.findById(productId)
     .then((product) => {
-      /* console.log(product);
-      return */
-
       if (product.userId.toString() !== req.user._id.toString()) {
         return res.redirect('/');
       }
