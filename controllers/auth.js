@@ -23,7 +23,8 @@ exports.getLogin = (req, res, next) => {
   }
 
   console.log(message);
-  res.render('auth/login', {
+  res.render('auth/login', 
+  {
     path: '/login',
     docTitle: 'Login',
     errorMessage: message,
@@ -51,7 +52,7 @@ exports.postLogin = (req, res, next) => {
   User.findOne({ email: email })
     .then((user) => {
       if (!user) {
-        req.flash('error', 'invalid email or password');
+        req.flash('error', 'no user exist');
         return res.status(422).render('auth/login', {
           path: '/login',
           docTitle: 'Login',
@@ -63,7 +64,7 @@ exports.postLogin = (req, res, next) => {
       brcypt
         .compare(password, user.password)
         .then((doMatch) => {
-          console.log(doMatch);
+          console.log('doMatch');
           if (doMatch) {
             req.session.isLoggedIn = true;
             req.session.user = user;
@@ -87,7 +88,11 @@ exports.postLogin = (req, res, next) => {
           res.redirect('/login');
         });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -164,7 +169,11 @@ exports.postSignup = (req, res, next) => {
         html: '<h1>You succesfully got in</h1>',
       });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postLogout = (req, res, next) => {
@@ -217,7 +226,11 @@ exports.postReset = (req, res, next) => {
                  <p> Click this <a href="http://localhost:6050/reset/${token}"> LINL </a>   to set a new password`,
         });
       })
-      .catch((error) => {});
+      .catch((err) => {
+        const error = new Error(err);
+        error.httpStatusCode = 500;
+        return next(error);
+      });
   });
 };
 
@@ -246,7 +259,9 @@ exports.getNewPassword = (req, res, next) => {
       });
     })
     .catch((err) => {
-      console.log(err);
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
     });
 };
 
@@ -275,5 +290,9 @@ exports.postNewPassword = (req, res, next) => {
         })
         .catch((err) => console.log(err));
     })
-    .catch((error) => console.log(error));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };

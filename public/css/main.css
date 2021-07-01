@@ -164,6 +164,7 @@ main {
   flex-wrap: wrap;
   justify-content: space-around;
 }
+
 .user-message {
   text-align: center;
   /*  margin: auto; */
@@ -173,12 +174,12 @@ main {
   padding: 5px 1rem;
   /* border-radius: 3px; */
   /* border: 1px solid rgb(153, 153, 241); */
-  /*   background: rgb(255 29 29 / 63%); */
+    background: rgb(255 29 29 / 63%);
 }
 
 .user-message--error {
   border-color: #ffc1c1;
-  /* background-color: rgb(255 29 29 / 63%); */
+  background-color: rgb(255 29 29 / 63%);
 }
 a.active {
   color: #5d2f6c !important;

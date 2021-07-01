@@ -11,6 +11,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const User = require('./models/user');
 const csrf = require('csurf');
 const flash = require('connect-flash');
+const multer = require('multer');
 
 /*ROUTES mirels IMPORTS*/
 const errorController = require('./controllers/error');
@@ -31,18 +32,55 @@ const store = new MongoDBStore({
 
 const csrfProtection = csrf();
 
+/* Multer Config */
+const fileStorageConfig = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(
+      null,
+      new Date().toISOString().replace(/[^a-zA-Z0-9]/g, '') +
+        '-' +
+        file.originalname
+    );
+  },
+});
+
+const fileFilterConfig = (req, file, cb) => {
+  const { mimetype } = file;
+
+  if (
+    mimetype === 'image/png' ||
+    mimetype === 'image/jpeg' ||
+    mimetype === 'image/jpg'
+  ) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
 /* Setting the views engine */
 app.set('views', 'views');
 app.set('view engine', 'ejs');
 
-/*LOGGER*/
+/*MiddleWares*/
 app.use(morgan('tiny'));
 
 app.use(express.json({ limit: '20mb' }));
 
 app.use(express.urlencoded({ extended: false, limit: '20mb' }));
 
+app.use(
+  multer({ storage: fileStorageConfig, fileFilter: fileFilterConfig }).single(
+    'image'
+  )
+); /* file upload */
+
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/images',express.static(path.join(__dirname, 'images')));
+
 
 app.use(
   session({
@@ -54,7 +92,12 @@ app.use(
 );
 
 app.use(csrfProtection);
-
+/* could be written in a middleware */
+app.use((req, res, next) => {
+  res.locals.isAuthenticated = req.session.isLoggedIn;
+  res.locals.csrfToken = req.csrfToken();
+  next();
+});
 app.use(flash());
 /* Checking if there is a user could be written in a middleware*/
 app.use((req, res, next) => {
@@ -70,14 +113,10 @@ app.use((req, res, next) => {
       next();
     })
     .catch((err) => {
-      throw new Error(err);
+      next(
+        new Error(err)
+      ); /* insde asyn calls you need to use next error in sync no*/
     });
-});
-/* could be written in a middleware */
-app.use((req, res, next) => {
-  res.locals.isAuthenticated = req.session.isLoggedIn;
-  res.locals.csrfToken = req.csrfToken();
-  next();
 });
 
 app.use('/admin', adminDataRoutes);
@@ -85,6 +124,8 @@ app.use(shopRoutes);
 app.use(authRoutes);
 
 app.use('/500', errorController.get500);
+
+/* error handling */
 app.use(errorController.get404);
 
 app.use((error, req, res, next) => {

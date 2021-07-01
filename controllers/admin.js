@@ -21,19 +21,22 @@ exports.getProducts = (req, res, next) => {
         path: '/admin/products',
       });
     })
-    .catch((err) => console.log(err.message));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.getEditProduct = (req, res, next) => {
   const editMode = req.query.edit;
-  console.log(editMode);
+  /* console.log(editMode); */
   if (!editMode) {
     return res.redirect('/');
   }
   const prodId = req.params.productId;
   Product.findById(prodId)
     .then((product) => {
-      throw new Error('ERROR');
       if (!product) {
         console.log('no product');
         return res.redirect('/admin/products');
@@ -49,23 +52,32 @@ exports.getEditProduct = (req, res, next) => {
     })
     .catch((err) => {
       const error = new Error(err);
-      /*  error.httpStatusCode = 500;
-      return next(error); */
-      return res.status(500).render('/500', {
+      error.httpStatusCode = 500;
+      return next(error);
+      /*  return res.status(500).render('/500', {
         error: error,
-      });
+      }); */
     });
 };
 
 exports.postAddProduct = (req, res, next) => {
-  const { title, imageUrl, price, description } = req.body;
-
+  const { title, price, description } = req.body;
+  const image = req.file;
   const errors = validationResult(req);
 
+  if (!image) {
+    /* manual push of the error object since it cant be done with the package */
+    errors.errors.push({
+      value: ' ',
+      msg: 'Invalid Image check size and/or format',
+      param: 'Image',
+      location: 'body',
+    });
+  }
   if (!errors.isEmpty()) {
     const { param } = errors.array()[0];
     console.log(errors);
-    return res.render('admin/edit-product', {
+    return res.status(422).render('admin/edit-product', {
       docTitle: 'Add Product',
       path: '/admin/add-product',
       editing: false,
@@ -74,7 +86,6 @@ exports.postAddProduct = (req, res, next) => {
         title: param === 'title' ? '' : title,
         price: param === 'price' ? '' : price,
         description: param === 'description' ? '' : description,
-        imageUrl: param == 'imageUrl' ? '' : imageUrl,
       },
       errorMessage: errors.array(),
 
@@ -86,7 +97,7 @@ exports.postAddProduct = (req, res, next) => {
     title,
     price,
     description,
-    imageUrl,
+    imageUrl: image.path,
     userId: req.user /* ._id  <--mongoose will pick this object */,
     userName: req.user.userName,
   });
@@ -121,14 +132,15 @@ exports.postAddProduct = (req, res, next) => {
 };
 
 exports.postEditProduct = (req, res, next) => {
-  const { productId, title, imageUrl, price, description } = req.body;
-  console.log(productId);
-  console.log(req.user._id.toString());
+  const { productId, title, price, description } = req.body;
+  const { image } = req.file;
+  /*  console.log(productId);
+  console.log(req.user._id.toString()); */
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
     const { value, msg, param } = errors.array()[0];
-    return res.render('admin/edit-product', {
+    return res.status(422).render('admin/edit-product', {
       docTitle: 'Add Product',
       path: '/admin/add-product',
       editing: true,
@@ -137,7 +149,6 @@ exports.postEditProduct = (req, res, next) => {
         title: param === 'title' ? '' : title,
         price: param === 'price' ? '' : price,
         description: param === 'description' ? '' : description,
-        imageUrl: param == 'imageUrl' ? '' : imageUrl,
       },
       errorMessage: errors.array(),
 
@@ -152,8 +163,8 @@ exports.postEditProduct = (req, res, next) => {
       }
       product.title = title;
       product.price = price;
-      product.imageUrl = imageUrl;
       product.price = price;
+      product.imageUrl = image.path || null;
       product.description = description;
 
       return product
@@ -164,7 +175,11 @@ exports.postEditProduct = (req, res, next) => {
         })
         .catch((err) => console.log(err));
     })
-    .catch((error) => console.log(error));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };
 
 exports.postDeleteProduct = (req, res, next) => {
@@ -175,5 +190,9 @@ exports.postDeleteProduct = (req, res, next) => {
       console.log('Deleted');
       res.redirect('/admin/products');
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+      const error = new Error(err);
+      error.httpStatusCode = 500;
+      return next(error);
+    });
 };

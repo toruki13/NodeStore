@@ -25,7 +25,7 @@ router.post(
     body('title', 'Title must be 5 characters minimum')
       .isLength({ min: 5 })
       .trim(),
-    body('imageUrl', 'Please enter a valid image URL ').isURL().trim(),
+    /* body('imageUrl', 'Please enter a valid image URL ').isURL().trim(), */
     body('price', 'Price must be a number').isNumeric(),
     body('description', 'description should be 5 letters long')
       .isLength({
@@ -35,7 +35,7 @@ router.post(
         /*  console.log(req.body); */
         const wordsArray = req.body.description.split(' ');
         const amountOfWords = wordsArray.length;
-        console.log(amountOfWords);
+        /*  console.log(amountOfWords); */
         if (!amountOfWords || amountOfWords < 8) {
           throw new Error(`The Description Should be 8 words minimum`);
         }
@@ -55,7 +55,6 @@ router.post(
     body('title', 'Title must be 5 characters minimum')
       .isLength({ min: 5 })
       .trim(),
-    body('imageUrl', 'Please enter a valid image URL ').isURL().trim(),
     body('price', 'Price must be a number').isNumeric(),
     body('description', 'description should be 5 letters long')
       .isLength({
