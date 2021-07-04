@@ -64,7 +64,6 @@ router.post(
         /*  console.log(req.body); */
         const wordsArray = req.body.description.split(' ');
         const amountOfWords = wordsArray.length;
-        console.log(amountOfWords);
         if (!amountOfWords || amountOfWords < 8) {
           throw new Error(`The Description Should be 8 words minimum`);
         }
